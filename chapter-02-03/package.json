@@ -1,0 +1,26 @@
+{
+  "name": "chapter-02-03",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node ./build/dev.js",
+    "build": "node ./build/build.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@rollup/plugin-babel": "^5.0.0",
+    "chalk": "^2.4.1",
+    "chokidar": "^2.0.4",
+    "koa": "^2.5.2",
+    "koa-compose": "^4.1.0",
+    "koa-static": "^5.0.0",
+    "rollup": "^2.7.6",
+    "rollup-plugin-serve": "^1.0.1",
+    "rollup-plugin-uglify": "^6.0.4"
+  },
+  "dependencies": {}
+}
