@@ -1,19 +1,19 @@
-# 1.3 开发模式
+# 1.4 生产模式
 
 ## 前言
 
-实际项目中编译开发主要分成了 `开发模式`和`生产模式`两种甚至更多种情况，本篇主要讲述`rollup.js`怎么配置`开发模式`。主要要素有一下三点：
+`生产模式` 就是项目正式上线的模式，前端代码`生产模式`主要有以下几点要素：
 
-- 1.本地开发的 HTTP 服务
-- 2.生成开发调试的 sourceMap 文件
-- 3.不能混淆，保证编译后代码的可读性
+- 保证代码混淆，编译结果不可读
+- 体积压缩
+- 信息脱敏
 
-## 实现例子
+因此，rollup.js 的在`生产模式`下编译后的代码要有以下几点要求：
 
-- 编译 ES6+代码
-- 编译成`umd`格式(通用模块定义)
-- 编译生成 sourceMap 文件
-- 启动 HTTP 服务
+- 代码 uglify
+- 关闭 sourceMap
+- `npm run build` 启动执行 `生产模式`
+- `npm run dev` 启动执行 `开发模式`
 
 ### 步骤一 安装
 
@@ -26,20 +26,20 @@
   npm i --save-dev @rollup/plugin-babel @babel/core @babel/preset-env
   ## 安装 rollup.js 编译本地开发服务插件
   npm i --save-dev rollup-plugin-serve
+  ## 安装 rollup.js 编译代码混淆插件
+  npm i --save-dev rollup-plugin-uglify
+  ## 安装 rollup-plugin-delete 删除指定目录
+  npm i --save-dev rollup-plugin-delete
 ```
 
 - 修改 package.json 文件 scripts
 
 ```
   "scripts": {
-    "dev": "node_modules/.bin/rollup -w -c ./build/rollup.config.js"
+    "dev": "node_modules/.bin/rollup -w -c ./build/rollup.config.dev.js",
+    "build": "node_modules/.bin/rollup -c ./build/rollup.config.prod.js"
   },
 ```
-
-- `rollup` 模块是 rollup.js 编译的核心模块
-- `@rollup/plugin-babel` 模块是 rollup.js 支持 babel 官方编译插件模块
-- `@babel/core` 是官方 babel 编译核心模块
-- `@babel/preset-env` 是官方 babel 编译解析 ES6+ 语言的扩展模块
 
 ## 步骤二 rollup 配置
 
@@ -48,7 +48,7 @@
 ```js
 const path = require("path");
 const { babel } = require("@rollup/plugin-babel");
-const serve = require("rollup-plugin-serve");
+const del = require("rollup-plugin-delete");
 
 const resolveFile = function (filePath) {
   return path.join(__dirname, "..", filePath);
@@ -62,15 +62,51 @@ module.exports = {
     sourcemap: true,
   },
   plugins: [
+    del({ targets: "dist/*" }),
     babel({
       presets: ["@babel/preset-env"],
     }),
+  ],
+};
+```
+
+- `开发模式`配置基本 `./build/rollup.config.dev.js`
+
+```js
+const path = require("path");
+const serve = require("rollup-plugin-serve");
+const config = require("./rollup.config");
+
+const resolveFile = function (filePath) {
+  return path.join(__dirname, "..", filePath);
+};
+const PORT = 3001;
+
+config.output.sourcemap = true;
+config.plugins = [
+  ...config.plugins,
+  ...[
     serve({
-      port: 3001,
+      port: PORT,
+      // contentBase: [resolveFile('')]
       contentBase: [resolveFile("example"), resolveFile("dist")],
     }),
   ],
-};
+];
+
+module.exports = config;
+```
+
+- `生产模式`配置基本 `./build/rollup.config.prod.js`
+
+```js
+const { uglify } = require("rollup-plugin-uglify");
+const config = require("./rollup.config");
+
+config.output.sourcemap = false;
+config.plugins = [...config.plugins, ...[uglify()]];
+
+module.exports = config;
 ```
 
 ## 步骤三 创建待编译 ES6 源码
@@ -112,11 +148,13 @@ export default demo;
 
 ### 步骤 四: 编译结果
 
-- 在项目目录下执行 `npm run dev`
+- 在项目目录下执行`开发模式` `npm run dev`
+- 在项目目录下执行`生产模式` `npm run build`
 - 编译结果在目录 `./dist/` 下
 - 编译结果分成
   - ES5 代码文件 `./dist/index.js`
-  - 源码的 sourceMap 文件 `./dist/index.js.map`
+  - `生产模式` ES5 代码的生成会被`uglify`混淆压缩
+  - `开发模式` 会生成源码的 sourceMap 文件 `./dist/index.js.map`
 - 插件服务启动了`3001` 端口
 
 ### 步骤 五: 浏览器查看结果
