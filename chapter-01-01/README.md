@@ -1,13 +1,26 @@
+## 前言
+
+本篇主要以最简单的配置文件，来编译 ES6 代码文件
+
+## 实现例子
+
+- 只编译 ES6 代码
+- 编译成`iife`格式(立即执行的函数格式)
+
 ### 步骤一 安装
 
 ```sh
   npm init -y
   npm install rollup @rollup/plugin-buble --D
 ```
-- 修改package.json 文件 scripts
-> "scripts": {
->   "build": "node_modules/.bin/rollup -c ./build/rollup.config.js"
-> },
+
+- 修改 package.json 文件 scripts
+
+```
+  "scripts": {
+    "build": "node_modules/.bin/rollup -c ./build/rollup.config.js"
+  },
+```
 
 - `rollup` 模块是 rollup 编译的核心模块
 - `@rollup/plugin-buble` 模块是 rollup 的 ES6 编译插件

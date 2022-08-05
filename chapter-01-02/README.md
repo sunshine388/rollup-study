@@ -1,3 +1,12 @@
+## 前言
+
+本篇主要是讲述`rollup.js`下编译 `ES6+`源码
+
+## 实现例子
+
+- 编译 ES6+代码
+- 编译成`umd`格式(通用模块定义)
+
 ### 步骤一 安装
 
 ```sh
@@ -9,7 +18,7 @@
 
 ```
   "scripts": {
-  "build": "node_modules/.bin/rollup -c ./build/rollup.config.js"
+    "build": "node_modules/.bin/rollup -c ./build/rollup.config.js"
   },
 ```
 
